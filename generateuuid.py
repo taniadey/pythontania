@@ -1,38 +1,25 @@
-import requests
 import uuid
+import json
 
-folder_names = [
-    "Downstream, Renewables & Energy Solutions",
-    "Integrated Gas and Upstream",
-    "Corporate Functions",
-    "Corporate Relations",
-    "Finance",
-    "Human Resources",
-    "Legal",
-    "Projects & Technology",
-]
+uuid_list = []
+for i in range(10):
+    myuuid = uuid.uuid4()
+    uuid_list.append(str(myuuid))
 
-payload_dict = {
-    "uniqueId": None,
-    "name": None,
-    "parentUniqueId": "f06b6cc7-e3fb-465b-8770-c5ed7e92e08a",
-    "systemManaged": "False",
-}
+print(uuid_list)
 
+# Specify the file path
+json_file_path = "listuuid.json"
 
-client_id = "da735963-60c2-4d03-ad7e-1273bc42b4c6"
-client_secret = "mg0dF8_cTZ5SwO2PSDhx_g"
-token_url = "https://shell-api-stg.unily.com/connect/token"
-api_url = "https://shell-api-stg.unily.com/api/v1/media/folders"
-payload_dict = {
-    "uniqueId": "4046d2e5-0525-4638-b6c2-56004c760c7a",
-    "name": "Check2",
-    "parentUniqueId": "f06b6cc7-e3fb-465b-8770-c5ed7e92e08a",
-    "systemManaged": False,
-}
+# Convert the list to JSON and write it to a file
+with open(json_file_path, "w") as json_file:
+    json.dump(uuid_list, json_file, indent=2)
+
+print(f"List has been converted and written to {json_file_path}")
 
 
 def get_access_token(client_id, client_secret, token_url, scope=""):
+    # Prepare the payload for the token request
     payload = {
         "grant_type": "client_credentials",
         "client_id": client_id,
@@ -40,12 +27,17 @@ def get_access_token(client_id, client_secret, token_url, scope=""):
         "scope": scope,
     }
 
+    # Make the token request
     response = requests.post(token_url, data=payload, verify=False)
 
+    # Check if the request was successful (status code 200)
     if response.status_code == 200:
+        # Parse the JSON response
         token_data = response.json()
+        # Extract and return the access token
         return token_data.get("access_token")
     else:
+        # Print an error message if the request was not successful
         print("\n")
 
         print(f"Error: {response.status_code}")
@@ -79,18 +71,23 @@ def make_authenticated_post_request(url, data, access_token):
         print(response.text)
 
 
+# Example usage
+client_id = "da735963-60c2-4d03-ad7e-1273bc42b4c6"
+client_secret = "mg0dF8_cTZ5SwO2PSDhx_g"
+token_url = "https://shell-api-stg.unily.com/connect/token"
+api_url = "https://shell-api-stg.unily.com/api/v1/media/folders"  # Replace with your API endpoint
+data_to_post = {
+    "uniqueId": "4046d2e5-0525-4638-b6c2-56004c760c7a",
+    "name": "Check2",
+    "parentUniqueId": "f06b6cc7-e3fb-465b-8770-c5ed7e92e08a",
+    "systemManaged": False,
+}
+print("\n")
+print(type(data_to_post))
+
 access_token = get_access_token(client_id, client_secret, token_url)
 if access_token:
-    for i in range(8):
-        for key, value in payload_dict.items():
-            if key == "uniqueId":
-                payload_dict[key] = str(uuid.uuid4())
-            if key == "name":
-                payload_dict[key] = folder_names.pop(0)
-            else:
-                continue
-            print(payload_dict)
-            make_authenticated_post_request(api_url, payload_dict, access_token)
+    make_authenticated_post_request(api_url, data_to_post, access_token)
 else:
     print("\n")
     print("Failed to obtain Bearer Token")
