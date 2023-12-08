@@ -20,8 +20,8 @@ payload_dict = {
 }
 
 
-client_id = "da735963-60c2-4d03-ad7e-1273bc42b4c6"
-client_secret = "mg0dF8_cTZ5SwO2PSDhx_g"
+client_id = ""
+client_secret = ""
 token_url = "https://shell-api-stg.unily.com/connect/token"
 api_url = "https://shell-api-stg.unily.com/api/v1/media/folders"
 payload_dict = {
